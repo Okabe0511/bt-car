@@ -43,11 +43,6 @@ function hexToBytes(hexStr) {
     return bytes;
 }
 
-function escapeForDisplay(str) {
-    // 只转义制表符
-    return str.replace(/\t/g, '\\t');
-}
-
 function logData(data, isSend = false, rawBytes = null) {
     const timestamp = new Date().toLocaleTimeString();
     const prefix = isSend ? '[发送]' : '[接收]';
@@ -58,21 +53,23 @@ function logData(data, isSend = false, rawBytes = null) {
     if (displayMode === 'hex' && rawBytes) {
         displayStr = bytesToHex(rawBytes);
     } else if (typeof data === 'string') {
-        // 彻底处理所有可能的换行符表示方式
-        displayStr = data
-            .replace(/\\r\\n/g, '\n')  // 把 \r\n 变成换行
-            .replace(/\\n\\r/g, '\n')  // 把 \n\r 变成换行
-            .replace(/\\r/g, '\n')     // 把 \r 变成换行
-            .replace(/\\n/g, '\n');    // 把 \n 变成换行
+        // 直接暴力替换：把所有字面量的换行符都换成真正的换行
+        displayStr = data;
         
-        // 处理真正的换行符
-        displayStr = displayStr
-            .replace(/\r\n/g, '\n')
-            .replace(/\r/g, '\n');
+        // 先处理所有字面量的换行符表示
+        displayStr = displayStr.replace(/\\r\\n/g, '\n');
+        displayStr = displayStr.replace(/\\n\\r/g, '\n');
+        displayStr = displayStr.replace(/\\r/g, '\n');
+        displayStr = displayStr.replace(/\\n/g, '\n');
         
-        displayStr = escapeForDisplay(displayStr);
+        // 再处理真正的换行符
+        displayStr = displayStr.replace(/\r\n/g, '\n');
+        displayStr = displayStr.replace(/\r/g, '\n');
         
-        // 最后把换行符转换成 HTML 的 <br>
+        // 转义制表符，但不转义换行（已经处理好了）
+        displayStr = displayStr.replace(/\t/g, '\\t');
+        
+        // 把换行符变成 HTML 的 <br>
         displayStr = displayStr.replace(/\n/g, '<br>');
     } else {
         displayStr = data;
