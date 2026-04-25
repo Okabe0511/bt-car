@@ -44,7 +44,7 @@ function hexToBytes(hexStr) {
 }
 
 function escapeForDisplay(str) {
-    // 不转义换行符，保留它们用于真正的换行，只转义其他控制字符
+    // 只转义制表符
     return str.replace(/\t/g, '\\t');
 }
 
@@ -58,8 +58,13 @@ function logData(data, isSend = false, rawBytes = null) {
     if (displayMode === 'hex' && rawBytes) {
         displayStr = bytesToHex(rawBytes);
     } else if (typeof data === 'string') {
-        displayStr = escapeForDisplay(data);
-        // 将换行符替换为 HTML 的 <br> 标签来实现真正的换行
+        // 先处理转义的换行符
+        displayStr = data
+            .replace(/\\r\\n/g, '\n')  // 把 \r\n 变成换行
+            .replace(/\\r/g, '\n')     // 把 \r 变成换行
+            .replace(/\\n/g, '\n');    // 把 \n 变成换行
+        displayStr = escapeForDisplay(displayStr);
+        // 将换行符替换为 HTML 的 <br> 标签
         displayStr = displayStr.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/\r/g, '<br>');
     } else {
         displayStr = data;
