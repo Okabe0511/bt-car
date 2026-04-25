@@ -56,6 +56,8 @@ function logData(data, isSend = false, rawBytes = null) {
         displayStr = String(data);
     }
     
+    // 先处理字面量的换行符（\\r\\n, \\r, \\n）
+    displayStr = displayStr.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n');
     displayStr = displayStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     displayStr = displayStr.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     displayStr = displayStr.replace(/\n/g, '<br>');
