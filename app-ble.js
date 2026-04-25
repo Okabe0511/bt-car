@@ -53,37 +53,16 @@ function logData(data, isSend = false, rawBytes = null) {
     if (displayMode === 'hex' && rawBytes) {
         displayStr = bytesToHex(rawBytes);
     } else if (typeof data === 'string') {
-        displayStr = data;
-        
-        // 先处理字面量的换行符（注意：要用全局替换，且不要链式调用有问题）
-        // 处理 \r\n
-        let temp = '';
-        let i = 0;
-        while (i < displayStr.length) {
-            if (i + 3 < displayStr.length && displayStr[i] === '\\' && displayStr[i+1] === 'r' && displayStr[i+2] === '\\' && displayStr[i+3] === 'n') {
-                temp += '\n';
-                i += 4;
-            } else if (i + 1 < displayStr.length && displayStr[i] === '\\' && displayStr[i+1] === 'n') {
-                temp += '\n';
-                i += 2;
-            } else if (i + 1 < displayStr.length && displayStr[i] === '\\' && displayStr[i+1] === 'r') {
-                temp += '\n';
-                i += 2;
-            } else {
-                temp += displayStr[i];
-                i++;
-            }
-        }
-        displayStr = temp;
-        
-        // 再处理真正的换行符
-        displayStr = displayStr.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-        
-        // 转义制表符
-        displayStr = displayStr.replace(/\t/g, '\\t');
-        
-        // 最后把换行换成 <br>
-        displayStr = displayStr.replace(/\n/g, '<br>');
+        // 最简单的方法：直接把所有可能的换行符表示都替换成 <br>
+        displayStr = data
+            .replace(/\\r\\n/g, '<br>')
+            .replace(/\\n\\r/g, '<br>')
+            .replace(/\\r/g, '<br>')
+            .replace(/\\n/g, '<br>')
+            .replace(/\r\n/g, '<br>')
+            .replace(/\r/g, '<br>')
+            .replace(/\n/g, '<br>')
+            .replace(/\t/g, '\\t');
     } else {
         displayStr = data;
     }
