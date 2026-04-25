@@ -54,12 +54,16 @@ function logData(data, isSend = false, rawBytes = null) {
         displayStr = String(data);
     }
     
-    // 先处理字面量的换行符（\\r\\n, \\r, \\n）
-    displayStr = displayStr.replace(/\\r\\n/g, '\n').replace(/\\n/g, '\n').replace(/\\r/g, '\n');
-    displayStr = displayStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    displayStr = displayStr.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-    displayStr = displayStr.replace(/\n/g, '<br>');
+    // 正确顺序：1. 先处理字面量换行符 2. 再转义HTML 3. 最后把换行符替换成<br>
+    while (displayStr.indexOf('\\r\\n') >= 0) displayStr = displayStr.replace('\\r\\n', '\n');
+    while (displayStr.indexOf('\\n') >= 0) displayStr = displayStr.replace('\\n', '\n');
+    while (displayStr.indexOf('\\r') >= 0) displayStr = displayStr.replace('\\r', '\n');
     
+    displayStr = displayStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    while (displayStr.indexOf('\r\n') >= 0) displayStr = displayStr.replace('\r\n', '<br>');
+    while (displayStr.indexOf('\r') >= 0) displayStr = displayStr.replace('\r', '<br>');
+    while (displayStr.indexOf('\n') >= 0) displayStr = displayStr.replace('\n', '<br>');
     const line = `<span class="${className}">[${timestamp}] ${prefix} ${displayStr}</span>\n`;
     dataLog.innerHTML += line;
     dataLog.scrollTop = dataLog.scrollHeight;
