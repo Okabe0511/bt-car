@@ -56,14 +56,22 @@ function logData(data, isSend = false, rawBytes = null) {
     if (displayMode === 'hex' && rawBytes) {
         displayStr = bytesToHex(rawBytes);
     } else if (typeof data === 'string') {
-        // 先处理转义的换行符
+        // 彻底处理所有可能的换行符表示方式
         displayStr = data
             .replace(/\\r\\n/g, '\n')  // 把 \r\n 变成换行
+            .replace(/\\n\\r/g, '\n')  // 把 \n\r 变成换行
             .replace(/\\r/g, '\n')     // 把 \r 变成换行
             .replace(/\\n/g, '\n');    // 把 \n 变成换行
+        
+        // 处理真正的换行符
+        displayStr = displayStr
+            .replace(/\r\n/g, '\n')
+            .replace(/\r/g, '\n');
+        
         displayStr = escapeForDisplay(displayStr);
-        // 将换行符替换为 HTML 的 <br> 标签
-        displayStr = displayStr.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>').replace(/\r/g, '<br>');
+        
+        // 最后把换行符转换成 HTML 的 <br>
+        displayStr = displayStr.replace(/\n/g, '<br>');
     } else {
         displayStr = data;
     }
