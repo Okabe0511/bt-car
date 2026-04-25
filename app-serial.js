@@ -50,20 +50,13 @@ function logData(data, isSend = false, rawBytes = null) {
     let displayStr;
     if (displayMode === 'hex' && rawBytes) {
         displayStr = bytesToHex(rawBytes);
-    } else if (typeof data === 'string') {
-        // 最简单的方法：直接把所有可能的换行符表示都替换成 <br>
-        displayStr = data
-            .replace(/\\r\\n/g, '<br>')
-            .replace(/\\n\\r/g, '<br>')
-            .replace(/\\r/g, '<br>')
-            .replace(/\\n/g, '<br>')
-            .replace(/\r\n/g, '<br>')
-            .replace(/\r/g, '<br>')
-            .replace(/\n/g, '<br>')
-            .replace(/\t/g, '\\t');
     } else {
-        displayStr = data;
+        displayStr = String(data);
     }
+    
+    displayStr = displayStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    displayStr = displayStr.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    displayStr = displayStr.replace(/\n/g, '<br>');
     
     const line = `<span class="${className}">[${timestamp}] ${prefix} ${displayStr}</span>\n`;
     dataLog.innerHTML += line;
